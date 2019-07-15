@@ -7,11 +7,13 @@ public class Feedback {
         mFeedbackResId = feedbackResId;
     }
 
-    public int getFeedbackResId() {
+    public int getFeedbackResId()
+    {
         return mFeedbackResId;
     }
 
-    public void setFeedbackResId(int feedbackResId) {
+    public void setFeedbackResId(int feedbackResId)
+    {
         mFeedbackResId = feedbackResId;
     }
 }

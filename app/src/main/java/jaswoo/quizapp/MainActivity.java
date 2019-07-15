@@ -11,21 +11,21 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener
 {
 
     private TextView mTextView;
     private TextView mFeedback;
     private TextView mScoreTextView;
     private EditText mEditText;
-    private RadioButton mRadioButton;
-
 
     private LinearLayout mTrueFalseContainer;
     private LinearLayout mFillTheBlankContainer;
+    private LinearLayout mMultipleChoiceContainer;
 
     private Button mTrueButton;
     private Button mFalseButton;
@@ -33,6 +33,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton mPreviousButton;
     private Button mHintButton;
     private Button mCheckButton;
+
+    private RadioGroup mMCButtons;
+    private RadioButton mAButton;
+    private RadioButton mBButton;
+    private RadioButton mCButton;
+    private RadioButton mDButton;
+    private Button mMCCheckButton;
 
 
     private Question[] mQuestions;
@@ -56,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mTrueFalseContainer = (LinearLayout) findViewById(R.id.true_false_container);
         mFillTheBlankContainer = (LinearLayout) findViewById(R.id.fill_the_blank_container);
+        mMultipleChoiceContainer = (LinearLayout) findViewById(R.id.multiple_choice_container);
 
         mTrueButton = (Button) findViewById(R.id.true_button);
         mFalseButton = (Button) findViewById(R.id.false_button);
@@ -64,6 +72,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mHintButton = (Button) findViewById(R.id.hint_button);
         mCheckButton = (Button) findViewById(R.id.check_button);
 
+        mMCButtons = (RadioGroup) findViewById(R.id.mc_buttons);
+        mAButton = (RadioButton) findViewById(R.id.a_button);
+        mBButton = (RadioButton) findViewById(R.id.b_button);
+        mCButton = (RadioButton) findViewById(R.id.c_button);
+        mDButton = (RadioButton) findViewById(R.id.d_button);
 
         mTrueButton.setOnClickListener(this);
         mFalseButton.setOnClickListener(this);
@@ -72,9 +85,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mHintButton.setOnClickListener(this);
         mCheckButton.setOnClickListener(this);
 
+        mMCButtons.setOnCheckedChangeListener(this);
 
         //INITIALIZE AN ARRAY OF QUESTIONS
-        mQuestions = new Question[6];
+        mQuestions = new Question[7];
         mIndex = 0;
         mScore = 0;
         //INITIALIZE EACH SLOT IN THE ARRAY
@@ -87,10 +101,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String[] q6Answers = getResources().getStringArray(R.array.question_6_answers);
         mQuestions[5] = new FillTheBlankQuestion(R.string.question_6, R.string.question_6_hint,q6Answers);
 
+        mQuestions[6] = new MultipleChoiceQuestion(R.string.question_7, R.string.question_7_hint, R.array.question_7_answers, 2);
+
         //Set-up the first question
         setupQuestion();
 
-        mFeedbacks = new Feedback[6];
+        mFeedbacks = new Feedback[7];
         mFIndex = 0;
 
         mFeedbacks[0] = new Feedback(R.string.feedback_1);
@@ -98,8 +114,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mFeedbacks[2] = new Feedback(R.string.feedback_3);
         mFeedbacks[3] = new Feedback(R.string.feedback_4);
         mFeedbacks[4] = new Feedback(R.string.feedback_5);
-
         mFeedbacks[5] = new Feedback(R.string.feedback_5);
+        mFeedbacks[6] = new Feedback(R.string.feedback_6);
 
         mFeedback.setText(mFeedbacks[mFIndex].getFeedbackResId());
         mFeedback.setVisibility(View.GONE);
@@ -143,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mIndex++;
             mFIndex++;
 
-            setupQuestion();
+
 
             if (mIndex < mQuestions.length)
             {
@@ -156,11 +172,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
                 //CHANGE TEXT IN VIEW
+                setupQuestion();
                 mTextView.setText(mQuestions[mIndex].getTextResId());
                 mFeedback.setText(mFeedbacks[mFIndex].getFeedbackResId());
             }
             else
             {
+                mTrueFalseContainer.setVisibility(View.GONE);
+                mFillTheBlankContainer.setVisibility(View.GONE);
+                mMultipleChoiceContainer.setVisibility(View.GONE);
+                mNextButton.setVisibility(View.GONE);
+                mPreviousButton.setVisibility(View.GONE);
+                mHintButton.setVisibility(View.GONE);
                 mTextView.setText(R.string.question_end);
                 mFeedback.setVisibility(view.VISIBLE);
                 mFeedback.setText(R.string.feedback_end);
@@ -192,25 +215,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             myToast.show();
         }
     }
-    @Override
-    public void onRadioButtonClicked(View, view)
-    {
-        boolean checked = ((RadioButton) view).isChecked();
 
-        switch (view.getId)
+    @Override
+    public void onCheckedChanged(RadioGroup group, int checkedId)
+    {
+//        boolean checked = ((RadioButton) view).isChecked();
+
+        if (checkedId == -1)
+        {
+            return;
+        }
+
+        boolean answerIsCorrect = false;
+
+        switch (checkedId)
         {
             case R.id.a_button:
-                if (checked)
+                answerIsCorrect = checkAnswer(0);
                     break;
             case R.id.b_button:
-                if (checked)
+                answerIsCorrect = checkAnswer(1);
                     break;
             case R.id.c_button:
-                if (checked)
+                answerIsCorrect = checkAnswer(2);
                 break;
             case R.id.d_button:
-                if (checked)
+                answerIsCorrect = checkAnswer(3);
                 break;
+        }
+
+        if (answerIsCorrect)
+        {
+            mScore++;
+            mScoreTextView.setText(getString(R.string.score, mScore));
         }
     }
 
@@ -223,11 +260,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         {
             mTrueFalseContainer.setVisibility(View.VISIBLE);
             mFillTheBlankContainer.setVisibility(View.GONE);
+            mMultipleChoiceContainer.setVisibility(View.GONE);
         }
         else if (mQuestions[mIndex].isFillTheBlankQuestion())
         {
             mFillTheBlankContainer.setVisibility(View.VISIBLE);
             mTrueFalseContainer.setVisibility(View.GONE);
+            mMultipleChoiceContainer.setVisibility(View.GONE);
+        }
+        else if (mQuestions[mIndex].isMultipleChoiceQuestion())
+        {
+            mMultipleChoiceContainer.setVisibility(View.VISIBLE);
+            mTrueFalseContainer.setVisibility(View.GONE);
+            mFillTheBlankContainer.setVisibility(View.GONE);
+
+            int optionsResId = ((MultipleChoiceQuestion) mQuestions[mIndex]).getOptionsResId();
+            String[] options = getResources().getStringArray(optionsResId);
+            //USE OPTIONS ARRAY TO SET TEXT
+            mAButton.setText(options[0]);
+            mBButton.setText(options[1]);
+            mCButton.setText(options[2]);
+            mDButton.setText(options[3]);
+
+        }
+    }
+
+    public boolean checkAnswer(int userInput)
+    {
+        if (mQuestions[mIndex].checkAnswer(userInput))
+        {
+            Toast myToast = Toast.makeText(this, "YOU ARE CORRECT!", Toast.LENGTH_SHORT);
+            myToast.setGravity(Gravity.TOP, 0, 0);
+            myToast.show();
+            return true;
+        }
+        else
+        {
+            Toast myToast = Toast.makeText(this, "You are incorrect😟", Toast.LENGTH_SHORT);
+            myToast.setGravity(Gravity.TOP, 0, 0);
+            myToast.show();
+            return false;
         }
     }
 

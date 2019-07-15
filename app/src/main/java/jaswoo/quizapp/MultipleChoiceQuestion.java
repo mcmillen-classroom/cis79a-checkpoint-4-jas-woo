@@ -2,13 +2,15 @@ package jaswoo.quizapp;
 
 public class MultipleChoiceQuestion extends Question
 {
+    private int mOptionsResId;
     private int mAnswer;
-    private String[] mOptions;
 
-    public MultipleChoiceQuestion(int String text, int String[] getOptions, int answer)
+
+    public MultipleChoiceQuestion(int textResId, int hintResId, int optionsResId, int ans)
     {
         super(textResId, hintResId);
-        mAnswer = answer;
+        mOptionsResId = optionsResId;
+        mAnswer = ans;
     }
 
     @Override
@@ -22,18 +24,15 @@ public class MultipleChoiceQuestion extends Question
         return false;
     }
 
-    public String[] getOptions()
+    public int getOptionsResId()
     {
-        return mOptions;
+        return mOptionsResId;
     }
+
+    @Override
     public boolean isMultipleChoiceQuestion()
     {
         return true;
-    }
-    @Override
-    public boolean checkAnswer(int ans)
-    {
-        return mAnswer == ans;
     }
 }
 

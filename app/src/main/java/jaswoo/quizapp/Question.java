@@ -28,16 +28,24 @@ public class Question {
         mHintTextResId = hintTextResId;
     }
 
-    public boolean checkAnswer(boolean boolResponse) {
+    public boolean checkAnswer(boolean boolResponse)
+    {
         return false;
     }
 
-    public boolean checkAnswer(String userAnswer) {
+    public boolean checkAnswer(String userAnswer)
+    {
         return false;
     }
 
+    public boolean checkAnswer(int ans)
+    {
+        return false;
+    }
     //stub method; call this method to determine whether question is a TF question
     //Read more on STUBS
+
+
     public boolean isTrueFalseQuestion()
     {
         return false;
